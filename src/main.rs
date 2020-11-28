@@ -1,4 +1,4 @@
-use iced::{Align, button, Button, Row, Column, Element, Sandbox, Settings, Text, Length};
+use iced::{Align, button, Button, Row, Column, Element, Sandbox, Settings, Text};
 
 pub fn main() -> iced::Result {
     Calculator::run(Settings::default())
@@ -97,7 +97,7 @@ impl Sandbox for Calculator {
                 self.is_operator = false
             }
             Operator::Plus => {
-                self.is_operator = false
+                self.is_operator = true
             }
             Operator::Minus => {
                 self.is_operator = true
