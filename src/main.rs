@@ -1,13 +1,78 @@
-use iced::{Align, button, Button, Row, Column, Element, Sandbox, Settings, Text};
+// It's very difficult TT...
+
+use iced::{Container, Align, button, Button, Row, Column, Element, Sandbox, Settings, Text, Length};
 
 pub fn main() -> iced::Result {
     Calculator::run(Settings::default())
 }
 
+enum Operator {
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    None
+}
+
+impl Operator {
+    fn apply(&self, value: i64, calc_value: i64) -> i64 {
+        return match self {
+            Operator::Plus => {
+                calc_value + value
+            }
+            Operator::Minus => {
+                calc_value - value
+            }
+            Operator::Multiply => {
+                calc_value * value
+            }
+            Operator::Divide => {
+                calc_value / value
+            }
+            Operator::None => {
+                value
+            }
+        }
+    }
+
+    fn is_none(&self) -> bool {
+        if let Operator::None = self {
+            true
+        } else {
+            false
+        }
+    }
+}
+
+//
+// Operator default impl
+//
+impl Default for Operator {
+    fn default() -> Self { Operator::None }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum OperatorMessage {
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    Zero,
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine
+}
+
 #[derive(Default)]
 struct Calculator {
-    value: i64,
-    is_operator: bool,
+    value: String,
+    operator: Operator,
     zero_button: button::State,
     one_button: button::State,
     two_button: button::State,
@@ -25,26 +90,8 @@ struct Calculator {
     divide_button: button::State
 }
 
-#[derive(Debug, Clone, Copy)]
-enum Operator {
-    Plus,
-    Minus,
-    Multiply,
-    Divide,
-    Zero,
-    One,
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
-    Eight,
-    Nine
-}
-
 impl Sandbox for Calculator {
-    type Message = Operator;
+    type Message = OperatorMessage;
 
     fn new() -> Self {
         Self::default()
@@ -54,88 +101,110 @@ impl Sandbox for Calculator {
         String::from("rust-iced-calculator")
     }
 
-    fn update(&mut self, operator: Operator) {
-        match operator {
-            Operator::Zero => {
-                self.value = 0;
-                self.is_operator = false
+    fn update(&mut self, operator_message: OperatorMessage) {
+        let calc_value: i64 = match self.value.trim().parse() {
+            Ok(num) => num,
+            Err(_) => 0,
+        };
+
+        if !self.operator.is_none() {
+            self.value = String::from("");
+        }
+
+        // TODO(kuckjwi): better...
+        match operator_message {
+            OperatorMessage::Zero => {
+                self.value.push_str(self.operator.apply(0, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::One => {
-                self.value = 1;
-                self.is_operator = false
+            OperatorMessage::One => {
+                self.value.push_str(self.operator.apply(1, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Two => {
-                self.value = 2;
-                self.is_operator = false
+            OperatorMessage::Two => {
+                self.value.push_str(self.operator.apply(2, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Three => {
-                self.value = 3;
-                self.is_operator = false
+            OperatorMessage::Three => {
+                self.value.push_str(self.operator.apply(3, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Four => {
-                self.value = 4;
-                self.is_operator = false
+            OperatorMessage::Four => {
+                self.value.push_str(self.operator.apply(4, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Five => {
-                self.value = 5;
-                self.is_operator = false
+            OperatorMessage::Five => {
+                self.value.push_str(self.operator.apply(5, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Six => {
-                self.value = 6;
-                self.is_operator = false
+            OperatorMessage::Six => {
+                self.value.push_str(self.operator.apply(6, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Seven => {
-                self.value = 7;
-                self.is_operator = false
+            OperatorMessage::Seven => {
+                self.value.push_str(self.operator.apply(7, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Eight => {
-                self.value = 8;
-                self.is_operator = false
+            OperatorMessage::Eight => {
+                self.value.push_str(self.operator.apply(8, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Nine => {
-                self.value = 9;
-                self.is_operator = false
+            OperatorMessage::Nine => {
+                self.value.push_str(self.operator.apply(9, calc_value).to_string().as_ref());
+                self.operator = Operator::None;
             }
-            Operator::Plus => {
-                self.is_operator = true
+            OperatorMessage::Plus => {
+                self.operator = Operator::Plus;
             }
-            Operator::Minus => {
-                self.is_operator = true
+            OperatorMessage::Minus => {
+                self.operator = Operator::Minus;
             }
-            Operator::Multiply => {
-                self.is_operator = true
+            OperatorMessage::Multiply => {
+                self.operator = Operator::Multiply;
             }
-            Operator::Divide => {
-                self.is_operator = true
+            OperatorMessage::Divide => {
+                self.operator = Operator::Divide;
             }
         }
     }
 
-    fn view(&mut self) -> Element<Operator> {
-        // TODO(kuckjwi): design
-        Row::new()
-            .padding(10)
+    fn view(&mut self) -> Element<OperatorMessage> {
+        let row = Row::new()
             .align_items(Align::Center)
-            .push(Text::new(self.value.to_string()).size(50))
+            .spacing(5)
+            .push(Text::new(self.value.to_owned()).size(50))
             .push(Column::new()
-                .padding(10)
                 .align_items(Align::Center)
-                .push(Button::new(&mut self.one_button, Text::new("1")).on_press(Operator::One))
-                .push(Button::new(&mut self.four_button, Text::new("4")).on_press(Operator::Four))
-                .push(Button::new(&mut self.seven_button, Text::new("7")).on_press(Operator::Seven))
-                .push(Button::new(&mut self.zero_button, Text::new("0")).on_press(Operator::Zero)))
+                .spacing(5)
+                .push(Button::new(&mut self.one_button, Text::new("1")).on_press(OperatorMessage::One).padding(10))
+                .push(Button::new(&mut self.four_button, Text::new("4")).on_press(OperatorMessage::Four).padding(10))
+                .push(Button::new(&mut self.seven_button, Text::new("7")).on_press(OperatorMessage::Seven).padding(10))
+                .push(Button::new(&mut self.zero_button, Text::new("0")).on_press(OperatorMessage::Zero).padding(10)))
             .push(Column::new()
-                .padding(10)
                 .align_items(Align::Center)
-                .push(Button::new(&mut self.two_button, Text::new("2")).on_press(Operator::Two))
-                .push(Button::new(&mut self.five_button, Text::new("5")).on_press(Operator::Five))
-                .push(Button::new(&mut self.eight_button, Text::new("8")).on_press(Operator::Eight)))
+                .spacing(5)
+                .push(Button::new(&mut self.two_button, Text::new("2")).on_press(OperatorMessage::Two).padding(10))
+                .push(Button::new(&mut self.five_button, Text::new("5")).on_press(OperatorMessage::Five).padding(10))
+                .push(Button::new(&mut self.eight_button, Text::new("8")).on_press(OperatorMessage::Eight).padding(10)))
             .push(Column::new()
-                .padding(10)
                 .align_items(Align::Center)
-                .push(Button::new(&mut self.three_button, Text::new("3")).on_press(Operator::Three))
-                .push(Button::new(&mut self.six_button, Text::new("6")).on_press(Operator::Six))
-                .push(Button::new(&mut self.nine_button, Text::new("9")).on_press(Operator::Nine)))
+                .spacing(5)
+                .push(Button::new(&mut self.three_button, Text::new("3")).on_press(OperatorMessage::Three).padding(10))
+                .push(Button::new(&mut self.six_button, Text::new("6")).on_press(OperatorMessage::Six).padding(10))
+                .push(Button::new(&mut self.nine_button, Text::new("9")).on_press(OperatorMessage::Nine).padding(10)))
+            .push(Column::new()
+                .align_items(Align::Center)
+                .spacing(5)
+                .push(Button::new(&mut self.plus_button, Text::new("+")).on_press(OperatorMessage::Plus).padding(10))
+                .push(Button::new(&mut self.minus_button, Text::new("-")).on_press(OperatorMessage::Minus).padding(10))
+                .push(Button::new(&mut self.multiply_button, Text::new("*")).on_press(OperatorMessage::Multiply).padding(10))
+                .push(Button::new(&mut self.divide_button, Text::new("/")).on_press(OperatorMessage::Divide).padding(10)));
+
+        Container::new(row)
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .center_x()
+            .center_y()
             .into()
     }
 }
