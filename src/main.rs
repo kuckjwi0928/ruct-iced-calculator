@@ -66,7 +66,8 @@ enum OperatorMessage {
     Six,
     Seven,
     Eight,
-    Nine
+    Nine,
+    Clear
 }
 
 #[derive(Default)]
@@ -87,7 +88,13 @@ struct Calculator {
     plus_button: button::State,
     minus_button: button::State,
     multiply_button: button::State,
-    divide_button: button::State
+    divide_button: button::State,
+
+    empty_button: button::State,
+    empty_button2: button::State,
+    empty_button3: button::State,
+    empty_button4: button::State,
+    empty_button5: button::State,
 }
 
 impl Sandbox for Calculator {
@@ -111,7 +118,6 @@ impl Sandbox for Calculator {
             self.value = String::from("");
         }
 
-        // TODO(kuckjwi): better...
         match operator_message {
             OperatorMessage::Zero => {
                 self.value.push_str(self.operator.apply(0, calc_value).to_string().as_ref());
@@ -164,6 +170,10 @@ impl Sandbox for Calculator {
             }
             OperatorMessage::Divide => {
                 self.operator = Operator::Divide;
+            },
+            OperatorMessage::Clear => {
+                self.value = String::from("");
+                self.operator = Operator::None;
             }
         }
     }
@@ -176,29 +186,35 @@ impl Sandbox for Calculator {
             .push(Column::new()
                 .align_items(Align::Center)
                 .spacing(5)
-                .push(Button::new(&mut self.one_button, Text::new("1")).on_press(OperatorMessage::One).padding(10))
-                .push(Button::new(&mut self.four_button, Text::new("4")).on_press(OperatorMessage::Four).padding(10))
+                .push(Button::new(&mut self.empty_button, Text::new(" ")).padding(10))
                 .push(Button::new(&mut self.seven_button, Text::new("7")).on_press(OperatorMessage::Seven).padding(10))
+                .push(Button::new(&mut self.four_button, Text::new("4")).on_press(OperatorMessage::Four).padding(10))
+                .push(Button::new(&mut self.one_button, Text::new("1")).on_press(OperatorMessage::One).padding(10))
                 .push(Button::new(&mut self.zero_button, Text::new("0")).on_press(OperatorMessage::Zero).padding(10)))
             .push(Column::new()
                 .align_items(Align::Center)
                 .spacing(5)
-                .push(Button::new(&mut self.two_button, Text::new("2")).on_press(OperatorMessage::Two).padding(10))
+                .push(Button::new(&mut self.empty_button2, Text::new(" ")).padding(10))
+                .push(Button::new(&mut self.eight_button, Text::new("8")).on_press(OperatorMessage::Eight).padding(10))
                 .push(Button::new(&mut self.five_button, Text::new("5")).on_press(OperatorMessage::Five).padding(10))
-                .push(Button::new(&mut self.eight_button, Text::new("8")).on_press(OperatorMessage::Eight).padding(10)))
+                .push(Button::new(&mut self.two_button, Text::new("2")).on_press(OperatorMessage::Two).padding(10))
+                .push(Button::new(&mut self.empty_button3, Text::new(" ")).padding(10)))
             .push(Column::new()
                 .align_items(Align::Center)
                 .spacing(5)
-                .push(Button::new(&mut self.three_button, Text::new("3")).on_press(OperatorMessage::Three).padding(10))
+                .push(Button::new(&mut self.clear_button, Text::new("C")).on_press(OperatorMessage::Clear).padding(10))
+                .push(Button::new(&mut self.nine_button, Text::new("9")).on_press(OperatorMessage::Nine).padding(10))
                 .push(Button::new(&mut self.six_button, Text::new("6")).on_press(OperatorMessage::Six).padding(10))
-                .push(Button::new(&mut self.nine_button, Text::new("9")).on_press(OperatorMessage::Nine).padding(10)))
+                .push(Button::new(&mut self.three_button, Text::new("3")).on_press(OperatorMessage::Three).padding(10))
+                .push(Button::new(&mut self.empty_button4, Text::new(" ")).padding(10)))
             .push(Column::new()
                 .align_items(Align::Center)
                 .spacing(5)
                 .push(Button::new(&mut self.plus_button, Text::new("+")).on_press(OperatorMessage::Plus).padding(10))
                 .push(Button::new(&mut self.minus_button, Text::new("-")).on_press(OperatorMessage::Minus).padding(10))
                 .push(Button::new(&mut self.multiply_button, Text::new("*")).on_press(OperatorMessage::Multiply).padding(10))
-                .push(Button::new(&mut self.divide_button, Text::new("/")).on_press(OperatorMessage::Divide).padding(10)));
+                .push(Button::new(&mut self.divide_button, Text::new("/")).on_press(OperatorMessage::Divide).padding(10))
+                .push(Button::new(&mut self.empty_button5, Text::new(" ")).padding(10)));
 
         Container::new(row)
             .width(Length::Fill)
